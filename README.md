@@ -6,7 +6,7 @@
 
 ## 🎬 Демонстрация
 
-▶️ **Геймплей:** [https://youtu.be/VIDEO_ID](https://github.com/user-attachments/assets/9659acb8-0846-4e8f-8a30-2a6787632689)
+https://github.com/user-attachments/assets/9659acb8-0846-4e8f-8a30-2a6787632689
 
 Показан первый уровень и переключение на следующий.
 
