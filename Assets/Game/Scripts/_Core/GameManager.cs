@@ -1,8 +1,8 @@
-using System;
+using System.Collections.Generic;
 using Game.Scripts._UI;
 using Game.Scripts.Player;
 using UnityEngine;
-using UnityEngine.Splines;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Game.Scripts._Core
@@ -16,18 +16,25 @@ namespace Game.Scripts._Core
         [SerializeField] private CanvasMenuController _canvasMenu;
 
         [Space] 
-        [SerializeField] private Button _buttonStart;
+        [SerializeField] private CanvasController _looseController;
+        [SerializeField] private CanvasController _winController;
 
         [Space] 
-        [SerializeField] private SplineAnimate _splineAnimate;
+        [SerializeField] private Button _buttonStart;
+        [SerializeField] private List<Button> _buttonsReset;
+
+        [Space] 
+        
         [SerializeField] private PlayerController _playerController;
+
+        private BalanceManager _balanceManager;
+        private bool _isResetting = false;
 
         private void Awake()
         {
             if (Instance && Instance != null)
             {
-                Destroy(gameObject);
-                return;
+                Destroy(Instance.gameObject);
             }
 
             Instance = this;
@@ -36,29 +43,54 @@ namespace Game.Scripts._Core
 
         private void Start()
         {
+            _balanceManager = BalanceManager.Instance;
+            _balanceManager.OnChange += CheckBalanceGame;
+            
             _canvasInterface.Hide();
             _canvasMenu.Show();
-            
-            _splineAnimate.Restart(false);
+            _winController.Hide();
+            _looseController.Hide();
 
             _buttonStart.interactable = true;
             _buttonStart.onClick.AddListener(StartGame);
+            
+            _buttonsReset.ForEach(b => b.interactable = false);
+            _buttonsReset.ForEach(b => b.onClick.AddListener(ResetGame));
         }
 
         private void OnDestroy()
         {
+            _balanceManager.OnChange -= CheckBalanceGame;
+            
             _buttonStart.onClick.RemoveListener(StartGame);
-            _playerController.StopControlPlayer();
-        }
-
-        public void LooseGame()
-        {
+            _buttonsReset.ForEach(b => b.onClick.RemoveListener(ResetGame));
             _playerController.StopControlPlayer();
         }
 
         public void WinGame()
         {
-            _playerController.StopControlPlayer();
+            _playerController.Win();
+            _looseController.Hide();
+            _winController.Show();
+            _buttonsReset.ForEach(b => b.interactable = true);
+        }
+        
+        private void LooseGame()
+        {
+            _playerController.Loose();
+            _looseController.Show();
+            _winController.Hide();
+            _buttonsReset.ForEach(b => b.interactable = true);
+        }
+
+        private void ResetGame()
+        {
+            if (_isResetting)
+                return;
+            
+            _isResetting = true;
+            _buttonsReset.ForEach(b => b.interactable = false);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
 
         private void StartGame()
@@ -68,8 +100,15 @@ namespace Game.Scripts._Core
             _canvasInterface.Show();
             _canvasMenu.Hide();
             
-            _splineAnimate.Play();
             _playerController.StartControlPlayer();
+        }
+
+        private void CheckBalanceGame(int balance)
+        {
+            if (balance > 0)
+                return;
+            
+            LooseGame();
         }
     }
 }
