@@ -7,7 +7,7 @@
 ## 🎬 Демонстрация
 
 https://github.com/user-attachments/assets/9659acb8-0846-4e8f-8a30-2a6787632689
-
+[YouTube](https://youtu.be/qLEIf61-_bQ)
 Показан первый уровень и переключение на следующий.
 
 ## 🎮 Управление
